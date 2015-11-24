@@ -19,11 +19,11 @@ void TrainFromXML(const FunctionCallbackInfo<Value>& args) {
   Detector::New(args);
 }
 
-void InitAll(Local<Object> exports, Local<Object> module) {
+void InitAll(Local<Object> exports) {
   Detector::Init(exports);
 
-  //NODE_SET_METHOD(module, "exports", CreateDetector);
-  //NODE_SET_METHOD(module, "exports", TrainFromXML);
+  NODE_SET_METHOD(exports, "createDetector", CreateDetector);
+  NODE_SET_METHOD(exports, "trainFromXML", TrainFromXML);
 }
 
 NODE_MODULE(ObjectDetector, InitAll)

@@ -29,6 +29,7 @@ namespace ObjectDetector {
 
     // Prototype
     NODE_SET_PROTOTYPE_METHOD(tpl, "predictShapeInRect", PredictShapeInRect);
+    NODE_SET_PROTOTYPE_METHOD(tpl, "saveToFile", SaveToFile);
 
     constructor.Reset(isolate, tpl->GetFunction());
     exports->Set(String::NewFromUtf8(isolate, "Predictor"), tpl->GetFunction());

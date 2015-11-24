@@ -30,6 +30,7 @@ namespace ObjectDetector {
     // Prototype
     NODE_SET_PROTOTYPE_METHOD(tpl, "detectInImageFile", DetectInImageFile);
     NODE_SET_PROTOTYPE_METHOD(tpl, "saveToFile", SaveToFile);
+    NODE_SET_PROTOTYPE_METHOD(tpl, "saveImageRepresentation", SaveImageRepresentation);
 
     constructor.Reset(isolate, tpl->GetFunction());
     exports->Set(String::NewFromUtf8(isolate, "Detector"), tpl->GetFunction());
@@ -153,7 +154,7 @@ namespace ObjectDetector {
           verbose = optVerbose->BooleanValue();
         }
 
-        Local<Value> optThreads = options->Get(String::NewFromUtf8(isolate, "nThreads"));
+        Local<Value> optThreads = options->Get(String::NewFromUtf8(isolate, "threads"));
         if (!optThreads->IsUndefined()) {
           nThreads = optThreads->IntegerValue();
         }
@@ -196,6 +197,24 @@ namespace ObjectDetector {
       Detector* obj = ObjectWrap::Unwrap<Detector>(args.Holder());
       v8::String::Utf8Value filePath(args[0]->ToString());
       dlib::serialize(std::string(*filePath)) << obj->dlibObjectDetector;
+    } catch (std::exception& e) {
+      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, e.what())));
+    }
+  }
+
+  void Detector::SaveImageRepresentation(const FunctionCallbackInfo<Value>& args) {
+    Isolate* isolate = args.GetIsolate();
+
+    if (args.Length() != 1) {
+      isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      return;
+    }
+
+    try {
+      Detector* obj = ObjectWrap::Unwrap<Detector>(args.Holder());
+      v8::String::Utf8Value filePath(args[0]->ToString());
+      dlib::save_png(draw_fhog(obj->dlibObjectDetector), std::string(*filePath));
     } catch (std::exception& e) {
       isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, e.what())));
     }

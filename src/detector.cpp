@@ -38,6 +38,12 @@ namespace ObjectDetector {
   void Detector::New(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
+    if (args.Length() > 1) {
+      isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      return;
+    }
+
     try {
       if (args.IsConstructCall()) {
         // Invoked as constructor: `new Detector(...)`
@@ -65,6 +71,12 @@ namespace ObjectDetector {
 
   void Detector::DetectInImageFile(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
+
+    if (args.Length() != 1) {
+      isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      return;
+    }
 
     try {
       Detector* obj = ObjectWrap::Unwrap<Detector>(args.Holder());
@@ -101,6 +113,12 @@ namespace ObjectDetector {
   void Detector::TrainFromXML(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
+    if (args.Length() < 1 || args.Length() > 2) {
+      isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      return;
+    }
+
     try {
       Local<Function> cons = Local<Function>::New(isolate, constructor);
       Local<Object> inst = cons->NewInstance(0, 0);
@@ -108,6 +126,38 @@ namespace ObjectDetector {
 
       Detector* obj = ObjectWrap::Unwrap<Detector>(inst);
       v8::String::Utf8Value xmlPath(args[0]->ToString());
+
+      double c = 1, windowSize = 80, epsilon = 0.01;
+      bool verbose = true;
+      int nThreads = 4;
+      if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
+        Local<Object> options = args[1]->ToObject();
+
+        Local<Value> optC = options->Get(String::NewFromUtf8(isolate, "c"));
+        if (!optC->IsUndefined()) {
+          c = optC->NumberValue();
+        }
+
+        Local<Value> optWindowSize = options->Get(String::NewFromUtf8(isolate, "windowSize"));
+        if (!optWindowSize->IsUndefined()) {
+          windowSize = optWindowSize->NumberValue();
+        }
+
+        Local<Value> optEpsilon = options->Get(String::NewFromUtf8(isolate, "epsilon"));
+        if (!optEpsilon->IsUndefined()) {
+          epsilon = optEpsilon->NumberValue();
+        }
+
+        Local<Value> optVerbose = options->Get(String::NewFromUtf8(isolate, "verbose"));
+        if (!optVerbose->IsUndefined()) {
+          verbose = optVerbose->BooleanValue();
+        }
+
+        Local<Value> optThreads = options->Get(String::NewFromUtf8(isolate, "nThreads"));
+        if (!optThreads->IsUndefined()) {
+          nThreads = optThreads->IntegerValue();
+        }
+      }
 
       dlib::array<dlib::array2d<unsigned char> > images_train;
       std::vector<std::vector<dlib::rectangle> > face_boxes_train;
@@ -117,16 +167,17 @@ namespace ObjectDetector {
       dlib::add_image_left_right_flips(images_train, face_boxes_train);
 
       image_scanner_type scanner;
-      scanner.set_detection_window_size(80, 80);
+      scanner.set_detection_window_size(windowSize, windowSize);
       dlib::structural_object_detection_trainer<image_scanner_type> trainer(scanner);
-      trainer.set_num_threads(4);
-      trainer.set_c(1);
-      trainer.be_verbose();
-      trainer.set_epsilon(0.01);
+      trainer.set_num_threads(nThreads);
+      trainer.set_c(c);
+      trainer.set_epsilon(epsilon);
+
+      if (verbose) {
+        trainer.be_verbose();
+      }
 
       obj->dlibObjectDetector = trainer.train(images_train, face_boxes_train);
-
-      //args.GetReturnValue().Set(rectangles);
     } catch (std::exception& e) {
       isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, e.what())));
     }
@@ -134,6 +185,12 @@ namespace ObjectDetector {
 
   void Detector::SaveToFile(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
+
+    if (args.Length() != 1) {
+      isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+      return;
+    }
 
     try {
       Detector* obj = ObjectWrap::Unwrap<Detector>(args.Holder());

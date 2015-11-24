@@ -162,7 +162,7 @@ namespace ObjectDetector {
 
       dlib::array<dlib::array2d<unsigned char> > images_train;
       std::vector<std::vector<dlib::rectangle> > face_boxes_train;
-      load_image_dataset(images_train, face_boxes_train, *xmlPath);
+      dlib::load_image_dataset(images_train, face_boxes_train, *xmlPath);
 
       // Add mirror images
       dlib::add_image_left_right_flips(images_train, face_boxes_train);

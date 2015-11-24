@@ -2,7 +2,7 @@
   'targets': [
     {
       'target_name': 'object-detector',
-      'sources': [ 'src/addon.cpp', 'src/detector.cpp', 'dlib/all/source.cpp' ],
+      'sources': [ 'src/addon.cpp', 'src/detector.cpp', 'src/predictor.cpp', 'dlib/all/source.cpp' ],
       'libraries': [ '-lpng', '-ljpeg'],
       'include_dirs': [ './' ],
       'defines': [ 'DLIB_JPEG_SUPPORT', 'DLIB_PNG_SUPPORT', 'DLIB_NO_GUI_SUPPORT' ],

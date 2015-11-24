@@ -1,6 +1,7 @@
 // addon.cpp
 #include <node.h>
 #include "detector.h"
+#include "predictor.h"
 
 namespace ObjectDetector {
 
@@ -19,13 +20,17 @@ namespace ObjectDetector {
     Detector::TrainFromXML(args);
   }
 
+  void TrainPredictorFromXML(const FunctionCallbackInfo<Value>& args) {
+    Predictor::TrainFromXML(args);
+  }
+
   void InitAll(Local<Object> exports) {
     Detector::Init(exports);
 
     NODE_SET_METHOD(exports, "createDetector", CreateDetector);
     NODE_SET_METHOD(exports, "trainFromXML", TrainFromXML);
+    NODE_SET_METHOD(exports, "trainPredictorFromXML", TrainPredictorFromXML);
   }
 
   NODE_MODULE(ObjectDetector, InitAll)
-
 }

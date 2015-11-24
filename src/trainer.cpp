@@ -16,9 +16,9 @@ namespace ObjectDetector {
   using v8::String;
   using v8::Value;
 
-  Persistent<Function> Detector::constructor;
+  Persistent<Function> Trainer::constructor;
 
-  void Detector::Init(Local<Object> exports) {
+  void Trainer::Init(Local<Object> exports) {
     Isolate* isolate = exports->GetIsolate();
 
     // Prepare constructor template
@@ -34,12 +34,12 @@ namespace ObjectDetector {
     Isolate* isolate = args.GetIsolate();
 
     if (args.IsConstructCall()) {
-      // Invoked as constructor: `new Detector(...)`
+      // Invoked as constructor: `new Trainer(...)`
       Trainer* obj = new Trainer();
       obj->Wrap(args.This());
       args.GetReturnValue().Set(args.This());
     } else {
-      // Invoked as plain function `Detector(...)`, turn into construct call.
+      // Invoked as plain function `Trainer(...)`, turn into construct call.
       const int argc = 1;
       Local<Value> argv[argc] = { args[0] };
       Local<Function> cons = Local<Function>::New(isolate, constructor);

@@ -99,6 +99,7 @@ INCS_Release := \
 OBJS := \
 	$(obj).target/$(TARGET)/src/addon.o \
 	$(obj).target/$(TARGET)/src/detector.o \
+	$(obj).target/$(TARGET)/src/predictor.o \
 	$(obj).target/$(TARGET)/dlib/all/source.o
 
 # Add to the list of files we specially track dependencies for.

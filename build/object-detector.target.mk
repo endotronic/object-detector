@@ -46,7 +46,7 @@ INCS_Debug := \
 	-I/Users/kevin/.node-gyp/4.1.1/src \
 	-I/Users/kevin/.node-gyp/4.1.1/deps/uv/include \
 	-I/Users/kevin/.node-gyp/4.1.1/deps/v8/include \
-	-I$(srcdir)/dlib \
+	-I$(srcdir)/. \
 	-I$(srcdir)/include \
 	-I/usr/local/include
 
@@ -92,14 +92,14 @@ INCS_Release := \
 	-I/Users/kevin/.node-gyp/4.1.1/src \
 	-I/Users/kevin/.node-gyp/4.1.1/deps/uv/include \
 	-I/Users/kevin/.node-gyp/4.1.1/deps/v8/include \
-	-I$(srcdir)/dlib \
+	-I$(srcdir)/. \
 	-I$(srcdir)/include \
 	-I/usr/local/include
 
 OBJS := \
 	$(obj).target/$(TARGET)/src/addon.o \
 	$(obj).target/$(TARGET)/src/detector.o \
-	$(obj).target/$(TARGET)/dlib/dlib/all/source.o
+	$(obj).target/$(TARGET)/dlib/all/source.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)

@@ -1,0 +1,21 @@
+{
+  "name": "object-detector",
+  "version": "1.0.0",
+  "description": "Node.js addon for object detection in images, implemented with dlib",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endotronic/object-detector.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/endotronic/object-detector/issues"
+  },
+  "homepage": "https://github.com/endotronic/object-detector#readme"
+}

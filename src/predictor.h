@@ -16,6 +16,10 @@ namespace ObjectDetector {
     static void TrainFromXML(const v8::FunctionCallbackInfo<v8::Value>& args);
 
    private:
+    explicit Predictor() {
+
+    }
+
     explicit Predictor(std::string xmlFile) {
       dlib::deserialize(xmlFile) >> this->dlibShapePredictor;
     }

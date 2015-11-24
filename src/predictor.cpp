@@ -37,24 +37,34 @@ namespace ObjectDetector {
   void Predictor::New(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
-    if (args.Length() != 1) {
+    if (args.Length() > 1) {
       isolate->ThrowException(Exception::TypeError(
           String::NewFromUtf8(isolate, "Wrong number of arguments")));
       return;
     }
 
-    if (args.IsConstructCall()) {
-      // Invoked as constructor: `new Predictor(...)`
-      v8::String::Utf8Value filePath(args[0]->ToString());
-      Predictor* obj = new Predictor(std::string(*filePath));
-      obj->Wrap(args.This());
-      args.GetReturnValue().Set(args.This());
-    } else {
-      // Invoked as plain function `Predictor(...)`, turn into construct call.
-      const int argc = 1;
-      Local<Value> argv[argc] = { args[0] };
-      Local<Function> cons = Local<Function>::New(isolate, constructor);
-      args.GetReturnValue().Set(cons->NewInstance(argc, argv));
+    try {
+      if (args.IsConstructCall()) {
+        // Invoked as constructor: `new Predictor(...)`
+        Predictor* obj;
+        if (args[0]->IsUndefined()) {
+          obj = new Predictor();
+        } else {
+          v8::String::Utf8Value xmlPath(args[0]->ToString());
+          obj = new Predictor(std::string(*xmlPath));
+        }
+
+        obj->Wrap(args.This());
+        args.GetReturnValue().Set(args.This());
+      } else {
+        // Invoked as plain function `Predictor(...)`, turn into construct call.
+        const int argc = 1;
+        Local<Value> argv[argc] = { args[0] };
+        Local<Function> cons = Local<Function>::New(isolate, constructor);
+        args.GetReturnValue().Set(cons->NewInstance(argc, argv));
+      }
+    } catch (std::exception& e) {
+      isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, e.what())));
     }
   }
 

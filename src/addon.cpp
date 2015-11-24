@@ -26,6 +26,7 @@ namespace ObjectDetector {
 
   void InitAll(Local<Object> exports) {
     Detector::Init(exports);
+    Predictor::Init(exports);
 
     NODE_SET_METHOD(exports, "createDetector", CreateDetector);
     NODE_SET_METHOD(exports, "trainFromXML", TrainFromXML);

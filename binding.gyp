@@ -6,8 +6,8 @@
       'libraries': [ '-lpng', '-ljpeg'],
       'include_dirs': [ './' ],
       'defines': [ 'DLIB_JPEG_SUPPORT', 'DLIB_PNG_SUPPORT', 'DLIB_NO_GUI_SUPPORT' ],
-      'cflags!': [ '-fno-exceptions', '-fnno-rtti' ],
-      'cflags_cc!': [ '-fno-exceptions', '-fnno-rtti' ],
+      'cflags!': [ '-fno-exceptions', '-fno-rtti' ],
+      'cflags_cc!': [ '-fno-exceptions', '-fno-rtti' ],
       'conditions': [
         ['OS=="mac"', {
           'xcode_settings': {

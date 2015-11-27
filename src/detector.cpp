@@ -128,7 +128,7 @@ namespace ObjectDetector {
       Detector* obj = ObjectWrap::Unwrap<Detector>(inst);
       v8::String::Utf8Value xmlPath(args[0]->ToString());
 
-      double c = 1, windowSize = 80, epsilon = 0.01;
+      double c = 1, windowWidth = 80, windowHeight = 80, epsilon = 0.01;
       bool verbose = true;
       int nThreads = 4;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
@@ -139,9 +139,14 @@ namespace ObjectDetector {
           c = optC->NumberValue();
         }
 
-        Local<Value> optWindowSize = options->Get(String::NewFromUtf8(isolate, "windowSize"));
-        if (!optWindowSize->IsUndefined()) {
-          windowSize = optWindowSize->NumberValue();
+        Local<Value> optWindowWith = options->Get(String::NewFromUtf8(isolate, "windowWidth"));
+        if (!optWindowWith->IsUndefined()) {
+          windowWidth = optWindowWith->NumberValue();
+        }
+
+        Local<Value> optWindowHeight = options->Get(String::NewFromUtf8(isolate, "windowHeight"));
+        if (!optWindowHeight->IsUndefined()) {
+          windowHeight = optWindowHeight->NumberValue();
         }
 
         Local<Value> optEpsilon = options->Get(String::NewFromUtf8(isolate, "epsilon"));
@@ -168,7 +173,7 @@ namespace ObjectDetector {
       dlib::add_image_left_right_flips(images_train, face_boxes_train);
 
       image_scanner_type scanner;
-      scanner.set_detection_window_size(windowSize, windowSize);
+      scanner.set_detection_window_size(windowWidth, windowHeight);
       dlib::structural_object_detection_trainer<image_scanner_type> trainer(scanner);
       trainer.set_num_threads(nThreads);
       trainer.set_c(c);

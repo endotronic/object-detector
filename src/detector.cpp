@@ -129,7 +129,7 @@ namespace ObjectDetector {
       v8::String::Utf8Value xmlPath(args[0]->ToString());
 
       double c = 1, windowWidth = 80, windowHeight = 80, epsilon = 0.01;
-      bool verbose = true;
+      bool verbose = true, scaleUpImages = false;
       int nThreads = 4;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
@@ -140,8 +140,8 @@ namespace ObjectDetector {
         }
 
         Local<Value> optWindowWith = options->Get(String::NewFromUtf8(isolate, "windowWidth"));
-        if (!optWindowWith->IsUndefined()) {
-          windowWidth = optWindowWith->NumberValue();
+        if (!optWindowWidth->IsUndefined()) {
+          windowWidth = optWindowWidth->NumberValue();
         }
 
         Local<Value> optWindowHeight = options->Get(String::NewFromUtf8(isolate, "windowHeight"));
@@ -159,6 +159,11 @@ namespace ObjectDetector {
           verbose = optVerbose->BooleanValue();
         }
 
+        Local<Value> optScale = options->Get(String::NewFromUtf8(isolate, "scaleUpImages"));
+        if (!optScale->IsUndefined()) {
+          scaleUpImages = optScale->BooleanValue();
+        }
+
         Local<Value> optThreads = options->Get(String::NewFromUtf8(isolate, "threads"));
         if (!optThreads->IsUndefined()) {
           nThreads = optThreads->IntegerValue();
@@ -168,6 +173,11 @@ namespace ObjectDetector {
       dlib::array<dlib::array2d<unsigned char> > images_train;
       std::vector<std::vector<dlib::rectangle> > face_boxes_train;
       dlib::load_image_dataset(images_train, face_boxes_train, *xmlPath);
+
+      if (scaleUpImages) {
+        // Double image size
+        dlib::upsample_image_dataset<dlib::pyramid_down<2> >(images_train, face_boxes_train);
+      }
 
       // Add mirror images
       dlib::add_image_left_right_flips(images_train, face_boxes_train);

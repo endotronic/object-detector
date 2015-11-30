@@ -139,7 +139,7 @@ namespace ObjectDetector {
           c = optC->NumberValue();
         }
 
-        Local<Value> optWindowWith = options->Get(String::NewFromUtf8(isolate, "windowWidth"));
+        Local<Value> optWindowWidth = options->Get(String::NewFromUtf8(isolate, "windowWidth"));
         if (!optWindowWidth->IsUndefined()) {
           windowWidth = optWindowWidth->NumberValue();
         }

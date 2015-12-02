@@ -129,7 +129,7 @@ namespace ObjectDetector {
       v8::String::Utf8Value xmlPath(args[0]->ToString());
 
       double c = 1, windowWidth = 80, windowHeight = 80, epsilon = 0.01;
-      bool verbose = true, scaleUpImages = false;
+      bool verbose = true, scaleUpImages = false, includeMirrors = false;
       int nThreads = 4;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
@@ -164,6 +164,11 @@ namespace ObjectDetector {
           scaleUpImages = optScale->BooleanValue();
         }
 
+        Local<Value> optMirrors = options->Get(String::NewFromUtf8(isolate, "includeMirrors"));
+        if (!optMirrors->IsUndefined()) {
+          includeMirrors = optMirrors->BooleanValue();
+        }
+
         Local<Value> optThreads = options->Get(String::NewFromUtf8(isolate, "threads"));
         if (!optThreads->IsUndefined()) {
           nThreads = optThreads->IntegerValue();
@@ -179,8 +184,10 @@ namespace ObjectDetector {
         dlib::upsample_image_dataset<dlib::pyramid_down<2> >(images_train, face_boxes_train);
       }
 
-      // Add mirror images
-      dlib::add_image_left_right_flips(images_train, face_boxes_train);
+      if (includeMirrors) {
+        // Add mirror images
+        dlib::add_image_left_right_flips(images_train, face_boxes_train);
+      }
 
       image_scanner_type scanner;
       scanner.set_detection_window_size(windowWidth, windowHeight);

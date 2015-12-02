@@ -87,7 +87,7 @@ namespace ObjectDetector {
       v8::String::Utf8Value xmlPath(args[0]->ToString());
 
       double cascadeDepth = 15, oversamplingAmount = 300, nu = 0.05;
-      bool verbose = true;
+      bool verbose = true, includeMirrors = false;
       int treeDepth = 2;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
@@ -112,6 +112,11 @@ namespace ObjectDetector {
           verbose = optVerbose->BooleanValue();
         }
 
+        Local<Value> optMirrors = options->Get(String::NewFromUtf8(isolate, "includeMirrors"));
+        if (!optMirrors->IsUndefined()) {
+          includeMirrors = optMirrors->BooleanValue();
+        }
+
         Local<Value> optTreeDepth = options->Get(String::NewFromUtf8(isolate, "treeDepth"));
         if (!optTreeDepth->IsUndefined()) {
           treeDepth = optTreeDepth->IntegerValue();
@@ -121,6 +126,11 @@ namespace ObjectDetector {
       dlib::array<dlib::array2d<unsigned char> > images_train;
       std::vector<std::vector<dlib::full_object_detection> > shapes_train;
       dlib::load_image_dataset(images_train, shapes_train, *xmlPath);
+
+      if (includeMirrors) {
+        // Add mirror images
+        dlib::add_image_left_right_flips(images_train, shapes_train);
+      }
 
       dlib::shape_predictor_trainer trainer;
       trainer.set_cascade_depth(cascadeDepth);

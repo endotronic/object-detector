@@ -86,11 +86,16 @@ namespace ObjectDetector {
       Predictor* obj = ObjectWrap::Unwrap<Predictor>(inst);
       v8::String::Utf8Value xmlPath(args[0]->ToString());
 
-      double cascadeDepth = 15, oversamplingAmount = 300, nu = 0.05;
+      double cascadeDepth = 10, oversamplingAmount = 20, nu = 0.1;
       bool verbose = true, includeMirrors = false;
-      int treeDepth = 2;
+      int treeDepth = 4;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
+
+        Local<Value> optVerbose = options->Get(String::NewFromUtf8(isolate, "verbose"));
+        if (!optVerbose->IsUndefined()) {
+          verbose = optVerbose->BooleanValue();
+        }
 
         Local<Value> optCascadeDepth = options->Get(String::NewFromUtf8(isolate, "cascadeDepth"));
         if (!optCascadeDepth->IsUndefined()) {
@@ -105,11 +110,6 @@ namespace ObjectDetector {
         Local<Value> optNu = options->Get(String::NewFromUtf8(isolate, "nu"));
         if (!optNu->IsUndefined()) {
           nu = optNu->NumberValue();
-        }
-
-        Local<Value> optVerbose = options->Get(String::NewFromUtf8(isolate, "verbose"));
-        if (!optVerbose->IsUndefined()) {
-          verbose = optVerbose->BooleanValue();
         }
 
         Local<Value> optMirrors = options->Get(String::NewFromUtf8(isolate, "includeMirrors"));
@@ -139,6 +139,10 @@ namespace ObjectDetector {
       trainer.set_tree_depth(treeDepth);
 
       if (verbose) {
+        std::cout << "Cascade depth set to " << cascadeDepth << std::endl;
+        std::cout << "Oversampling amount set to " << oversamplingAmount << std::endl;
+        std::cout << "Tree depth set to " << treeDepth << std::endl;
+        std::cout << "Nu set to " << nu << std::endl;
         trainer.be_verbose();
       }
 

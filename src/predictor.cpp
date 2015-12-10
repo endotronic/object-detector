@@ -88,7 +88,7 @@ namespace ObjectDetector {
 
       double cascadeDepth = 10, oversamplingAmount = 20, nu = 0.1;
       bool verbose = true, includeMirrors = false;
-      int treeDepth = 4;
+      int treeDepth = 5;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
 

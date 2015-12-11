@@ -684,7 +684,6 @@ namespace dlib
                 std::vector<dlib::vector<float,2> > deltas;
                 create_shape_relative_encoding(initial_shape, pixel_coordinates[cascade], anchor_idx, deltas);
 
-                console_progress_indicator pbarSamples(samples.size());
                 if (_verbose)
                     std::cout << "Computing feature values for this cascade..." << std::endl;
 
@@ -698,8 +697,7 @@ namespace dlib
 
                     if (_verbose)
                     {
-                        std::cout << "Sample " << i << " / " << samples.size() << "  ";
-                        pbarSamples.print_status(i);
+                        std::cout << "\rSample " << i << " / " << samples.size() << std::flush;
                     }
                 }
 
@@ -714,14 +712,17 @@ namespace dlib
                     if (_verbose)
                     {
                         ++trees_fit_so_far;
-                        std::cout << "Tree " << i << " / " << get_num_trees_per_cascade_level() << "  ";
+                        std::cout << "\rTree " << i << " / " << get_num_trees_per_cascade_level() << ".  ";
                         pbar.print_status(trees_fit_so_far);
                     }
                 }
+
+                if (_verbose)
+                    std::cout << std::endl;
             }
 
             if (_verbose)
-                std::cout << "Training complete                          " << std::endl;
+                std::cout << "Training complete" << std::endl;
 
             return shape_predictor(initial_shape, forests, pixel_coordinates);
         }

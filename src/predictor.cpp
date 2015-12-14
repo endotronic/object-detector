@@ -143,6 +143,8 @@ namespace ObjectDetector {
         std::cout << "Oversampling amount set to " << oversamplingAmount << std::endl;
         std::cout << "Tree depth set to " << treeDepth << std::endl;
         std::cout << "Nu set to " << nu << std::endl;
+        std::cout << "Mirrors: " << (includeMirrors ? "on" : "off") << std::endl;
+        std::cout << "Total samples: " << images_train.size() << std::endl;
         trainer.be_verbose();
       }
 

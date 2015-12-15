@@ -671,12 +671,15 @@ namespace dlib
             if (_verbose)
                 std::cout << "Fitting trees..." << std::endl;
 
+            // Start timer early since there may be big overhead computing feature values that we should track
+            pbar.print_status(trees_fit_so_far);
+
             std::vector<std::vector<impl::regression_tree> > forests(get_cascade_depth());
             // Now start doing the actual training by filling in the forests
             for (unsigned long cascade = 0; cascade < get_cascade_depth(); ++cascade)
             {
                 if (_verbose)
-                    std::cout << "Working at cascade " << cascade << " of " << get_cascade_depth() << std::endl;
+                    std::cout << "Working at cascade " << cascade + 1 << " of " << get_cascade_depth() << std::endl;
 
                 // Each cascade uses a different set of pixels for its features.  We compute
                 // their representations relative to the initial shape first.
@@ -697,7 +700,7 @@ namespace dlib
 
                     if (_verbose)
                     {
-                        std::cout << "\rSample " << i << " / " << samples.size() << std::flush;
+                        std::cout << "\rSample " << i + 1 << " / " << samples.size() << std::flush;
                     }
                 }
 
@@ -712,7 +715,7 @@ namespace dlib
                     if (_verbose)
                     {
                         ++trees_fit_so_far;
-                        std::cout << "\rTree " << i << " / " << get_num_trees_per_cascade_level() << ".  ";
+                        std::cout << "\rTree " << i + 1 << " / " << get_num_trees_per_cascade_level() << ".  ";
                         pbar.print_status(trees_fit_so_far);
                     }
                 }

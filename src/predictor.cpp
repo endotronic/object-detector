@@ -157,9 +157,9 @@ namespace ObjectDetector {
   void Predictor::PredictShapeInRect(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
-    if (args.Length() != 2) {
+    if (args.Length() != 2 || args[1]->IsUndefined() || !args[1]->IsObject()) {
       isolate->ThrowException(Exception::TypeError(
-          String::NewFromUtf8(isolate, "Wrong number of arguments")));
+          String::NewFromUtf8(isolate, "Wrong number/type of arguments")));
       return;
     }
 
@@ -167,10 +167,60 @@ namespace ObjectDetector {
       Predictor* obj = ObjectWrap::Unwrap<Predictor>(args.Holder());
       v8::String::Utf8Value imgPath(args[0]->ToString());
 
+      Local<Object> rect = args[1]->ToObject();
+      Local<Value> rectTop = rect->Get(String::NewFromUtf8(isolate, "top"));
+      if (rectTop->IsUndefined()) {
+        isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Rect top must be defined")));
+        return;
+      }
+
+      Local<Value> rectLeft = rect->Get(String::NewFromUtf8(isolate, "left"));
+      if (rectLeft->IsUndefined()) {
+        isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Rect left must be defined")));
+        return;
+      }
+
+      Local<Value> rectWidth = rect->Get(String::NewFromUtf8(isolate, "width"));
+      if (rectWidth->IsUndefined()) {
+        isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Rect width must be defined")));
+        return;
+      }
+
+      Local<Value> rectHeight = rect->Get(String::NewFromUtf8(isolate, "height"));
+      if (rectHeight->IsUndefined()) {
+        isolate->ThrowException(Exception::TypeError(
+          String::NewFromUtf8(isolate, "Rect height must be defined")));
+        return;
+      }
+
+      double top = rectTop->NumberValue(), left = rectLeft->NumberValue();
+      double width = rectWidth->NumberValue(), height = rectHeight->NumberValue();
       dlib::array2d<unsigned char> img;
       dlib::load_image(img, std::string(*imgPath));
 
-      // TODO: predict shape
+      dlib::rectangle detection(left, top, left + width, top + height);
+      dlib::full_object_detection shape = obj->dlibShapePredictor(img, detection);
+
+      HandleScope scope(isolate);
+      Local<Array> points = Array::New(isolate);
+      for (unsigned int i = 0; i < shape.num_parts(); ++i) {
+        double x = shape.part(i).x();
+        double y = shape.part(i).y();
+        double xScaled = x / img.nc(), yScaled = y / img.nr();
+
+        HandleScope scope(isolate);
+        Local<Object> point = Object::New(isolate);
+        point->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, x));
+        point->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, y));
+        point->Set(String::NewFromUtf8(isolate, "xScaled"), Number::New(isolate, xScaled));
+        point->Set(String::NewFromUtf8(isolate, "yScaled"), Number::New(isolate, yScaled));
+        points->Set(i, point);
+      }
+
+      args.GetReturnValue().Set(points);
     } catch (std::exception& e) {
       isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, e.what())));
     }
@@ -179,7 +229,7 @@ namespace ObjectDetector {
   void Predictor::SaveToFile(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
-    if (args.Length() != 1) {
+    if (args.Length() != 2) {
       isolate->ThrowException(Exception::TypeError(
           String::NewFromUtf8(isolate, "Wrong number of arguments")));
       return;

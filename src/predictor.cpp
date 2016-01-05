@@ -88,7 +88,7 @@ namespace ObjectDetector {
 
       double cascadeDepth = 10, oversamplingAmount = 20, nu = 0.1;
       bool verbose = true, includeMirrors = false;
-      int treeDepth = 5;
+      int treeDepth = 5, treesPerCascade = 500;
       if (args.Length() == 2 && !args[1]->IsUndefined() && args[1]->IsObject()) {
         Local<Object> options = args[1]->ToObject();
 
@@ -110,6 +110,11 @@ namespace ObjectDetector {
         Local<Value> optNu = options->Get(String::NewFromUtf8(isolate, "nu"));
         if (!optNu->IsUndefined()) {
           nu = optNu->NumberValue();
+        }
+
+        Local<Value> optTreesPerCascade = options->Get(String::NewFromUtf8(isolate, "treesPerCascadeLevel"));
+        if (!optTreesPerCascade->IsUndefined()) {
+          treesPerCascade = optTreesPerCascade->IntegerValue();
         }
 
         Local<Value> optMirrors = options->Get(String::NewFromUtf8(isolate, "includeMirrors"));
@@ -137,11 +142,13 @@ namespace ObjectDetector {
       trainer.set_oversampling_amount(oversamplingAmount);
       trainer.set_nu(nu);
       trainer.set_tree_depth(treeDepth);
+      trainer.set_num_trees_per_cascade_level(treesPerCascade);
 
       if (verbose) {
         std::cout << "Cascade depth set to " << cascadeDepth << std::endl;
-        std::cout << "Oversampling amount set to " << oversamplingAmount << std::endl;
+        std::cout << "Trees per cascade level set to " << treesPerCascade << std::endl;
         std::cout << "Tree depth set to " << treeDepth << std::endl;
+        std::cout << "Oversampling amount set to " << oversamplingAmount << std::endl;
         std::cout << "Nu set to " << nu << std::endl;
         std::cout << "Mirrors: " << (includeMirrors ? "on" : "off") << std::endl;
         std::cout << "Total samples: " << images_train.size() << std::endl;

@@ -236,7 +236,7 @@ namespace ObjectDetector {
   void Predictor::SaveToFile(const FunctionCallbackInfo<Value>& args) {
     Isolate* isolate = args.GetIsolate();
 
-    if (args.Length() != 2) {
+    if (args.Length() != 1) {
       isolate->ThrowException(Exception::TypeError(
           String::NewFromUtf8(isolate, "Wrong number of arguments")));
       return;
